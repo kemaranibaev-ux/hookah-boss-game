@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>HOOКAH BOSS — BOSS GAME</title>
+<script src="https://telegram.org/js/telegram-web-app.js?63"></script>
+<style>
+:root{
+  --bg:#090a0c; --card:#14161a; --card2:#1b1e23; --line:#292d34;
+  --text:#f5f5f5; --muted:#8d939d; --accent:#f2b84b; --accent2:#fff0c7;
+  --green:#54d68b; --red:#ff6868;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 50% -10%,#29210f 0,#0d0e10 35%,#090a0c 70%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;min-height:100vh}
+button{font:inherit}
+.app{max-width:520px;margin:auto;padding:18px 16px 34px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.brand{font-weight:900;letter-spacing:1.5px;font-size:15px}
+.brand span{color:var(--accent)}
+.icon{width:40px;height:40px;border:1px solid var(--line);border-radius:13px;background:#111317;color:#fff}
+.hero{padding:24px 20px;border:1px solid #332b1c;border-radius:26px;background:linear-gradient(145deg,#191714,#101114);box-shadow:0 18px 60px #0008;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:190px;height:190px;border-radius:50%;background:#f2b84b18;filter:blur(8px);right:-80px;top:-80px}
+.avatar{width:66px;height:66px;border-radius:22px;background:linear-gradient(135deg,#f2b84b,#7d5414);display:grid;place-items:center;font-size:26px;font-weight:900;color:#111;margin-bottom:14px;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.welcome{color:var(--muted);font-size:13px}
+.name{font-size:29px;font-weight:900;margin:2px 0 5px}
+.rank{display:inline-flex;padding:7px 10px;border-radius:10px;background:#f2b84b1a;border:1px solid #f2b84b55;color:var(--accent2);font-size:12px;font-weight:800;letter-spacing:.8px}
+.xprow{display:flex;justify-content:space-between;margin-top:22px;font-size:13px;color:var(--muted)}
+.xpbar{height:9px;background:#26282d;border-radius:99px;overflow:hidden;margin-top:8px}
+.xpfill{height:100%;background:linear-gradient(90deg,#9d6b19,#f7ca6c);border-radius:99px;transition:.35s}
+.section{margin-top:25px}
+.title{font-size:19px;font-weight:900;margin-bottom:11px}
+.subtitle{color:var(--muted);font-size:12px;margin-top:-5px;margin-bottom:12px}
+.task{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;margin:9px 0;display:flex;align-items:center;gap:13px}
+.task.done{opacity:.6}
+.taskico{width:42px;height:42px;border-radius:13px;background:#202328;display:grid;place-items:center;font-size:19px}
+.taskmain{flex:1}.taskname{font-weight:750;font-size:14px}.taskxp{color:var(--accent);font-size:12px;font-weight:800;margin-top:4px}
+.taskbtn{border:0;border-radius:11px;padding:9px 11px;background:var(--accent);color:#111;font-weight:850;font-size:12px}
+.taskbtn:disabled{background:#30343a;color:#777}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:22px}
+.tab{border:1px solid var(--line);background:#111317;color:#aeb3bb;border-radius:14px;padding:12px 4px;font-size:12px;font-weight:750}
+.tab.active{color:#111;background:var(--accent);border-color:var(--accent)}
+.panel{margin-top:12px}
+.hidden{display:none}
+.row{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--line);padding:14px;border-radius:16px;margin:8px 0}
+.left{display:flex;align-items:center;gap:11px}.num{width:28px;text-align:center;font-weight:900;color:var(--accent)}
+.rname{font-weight:750}.rxp{color:var(--muted);font-size:12px}
+.reward{padding:17px;background:linear-gradient(145deg,#18150f,#14161a);border:1px solid #3a301e;border-radius:18px;margin:9px 0}
+.reward b{display:block;margin-bottom:6px}.reward small{color:var(--muted)}
+.cta{width:100%;border:0;border-radius:16px;padding:15px;background:var(--accent);color:#111;font-weight:900;margin-top:12px}
+.footer{text-align:center;color:#666b73;font-size:11px;margin-top:25px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand">HOO<span>KAH</span> BOSS · GAME</div>
+    <button class="icon" onclick="tg.close()">×</button>
+  </div>
+
+  <section class="hero">
+    <div class="avatar" id="avatar">👑</div>
+    <div class="welcome">Добро пожаловать</div>
+    <div class="name" id="name">BOSS</div>
+    <div class="rank" id="rank">ROOKIE</div>
+    <div class="xprow"><span id="levelText">0 XP</span><span id="nextText">100 XP</span></div>
+    <div class="xpbar"><div class="xpfill" id="xpfill"></div></div>
+  </section>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('tasks',this)">🎯 Задания</button>
+    <button class="tab" onclick="showTab('rating',this)">👑 Рейтинг</button>
+    <button class="tab" onclick="showTab('rewards',this)">🎁 Награды</button>
+  </div>
+
+  <div id="tasks" class="panel">
+    <div class="section">
+      <div class="title">Твои задания</div>
+      <div class="subtitle">Закрывай задания и поднимай свой статус.</div>
+      <div id="taskList"></div>
+    </div>
+  </div>
+
+  <div id="rating" class="panel hidden">
+    <div class="section">
+      <div class="title">BOSS OF THE MONTH</div>
+      <div class="subtitle">Топ игроков ХК БОСС</div>
+      <div id="ratingList"></div>
+    </div>
+  </div>
+
+  <div id="rewards" class="panel hidden">
+    <div class="section">
+      <div class="title">Награды</div>
+      <div class="reward"><b>🔥 PLAYER · 100 XP</b><small>Открывается первый игровой статус.</small></div>
+      <div class="reward"><b>👑 BOSS · 300 XP</b><small>Доступ к специальным заданиям.</small></div>
+      <div class="reward"><b>💎 BIG BOSS · 600 XP</b><small>Привилегии Boss Game.</small></div>
+      <div class="reward"><b>🐉 LEGEND · 2000 XP</b><small>Главный статус сезона.</small></div>
+    </div>
+  </div>
+
+  <button class="cta" onclick="invite()">👥 ПРИГЛАСИТЬ ДРУГА</button>
+  <div class="footer">HOOКAH BOSS · Не просто пришёл. Поднял уровень.<br>Первая версия BOSS GAME</div>
+</div>
+
+<script>
+const tg = window.Telegram?.WebApp;
+if(tg){tg.ready(); tg.expand();}
+
+const levels=[
+  {xp:0,name:"ROOKIE"},{xp:100,name:"PLAYER"},{xp:300,name:"BOSS"},
+  {xp:600,name:"BIG BOSS"},{xp:1000,name:"HOOКAH BOSS"},{xp:2000,name:"LEGEND"}
+];
+const tasks=[
+  {id:"visit",ico:"🔥",name:"Посещение HOOКAH BOSS",xp:50},
+  {id:"taste",ico:"💨",name:"Попробовать вкус недели",xp:30},
+  {id:"ps5",ico:"🎮",name:"Победить в PS5",xp:100},
+  {id:"friend",ico:"👥",name:"Привести нового гостя",xp:100},
+  {id:"review",ico:"⭐",name:"Оставить честный отзыв",xp:30}
+];
+let state=JSON.parse(localStorage.getItem("bossGame")||'{"xp":0,"done":[]}');
+
+function userData(){
+  const u=tg?.initDataUnsafe?.user;
+  return u||null;
+}
+function render(){
+  const u=userData();
+  const name=(u?.first_name||localStorage.getItem("bossName")||"BOSS").toUpperCase();
+  document.getElementById("name").textContent=name;
+  if(u?.photo_url) document.getElementById("avatar").innerHTML='<img src="'+u.photo_url+'">';
+  let lvl=levels[0];
+  for(const x of levels) if(state.xp>=x.xp) lvl=x;
+  const next=levels.find(x=>x.xp>state.xp);
+  document.getElementById("rank").textContent=lvl.name;
+  document.getElementById("levelText").textContent=state.xp+" XP";
+  document.getElementById("nextText").textContent=next?next.xp+" XP":"MAX";
+  const pct=next?((state.xp-lvl.xp)/(next.xp-lvl.xp))*100:100;
+  document.getElementById("xpfill").style.width=Math.min(100,pct)+"%";
+  document.getElementById("taskList").innerHTML=tasks.map(t=>{
+    const done=state.done.includes(t.id);
+    return `<div class="task ${done?'done':''}">
+      <div class="taskico">${t.ico}</div>
+      <div class="taskmain"><div class="taskname">${t.name}</div><div class="taskxp">+${t.xp} XP</div></div>
+      <button class="taskbtn" ${done?'disabled':''} onclick="complete('${t.id}')">${done?'✓ ГОТОВО':'ВЗЯТЬ'}</button>
+    </div>`;
+  }).join("");
+  const demo=[
+    ["Артём",1840],["Тимур",1620],["Максим",1450],["Денис",1250],["Кемран",state.xp]
+  ].sort((a,b)=>b[1]-a[1]);
+  document.getElementById("ratingList").innerHTML=demo.map((r,i)=>`
+    <div class="row"><div class="left"><div class="num">#${i+1}</div><div><div class="rname">${r[0]}</div><div class="rxp">${r[1]} XP</div></div></div><div>${i===0?'👑':i===1?'🥈':i===2?'🥉':''}</div></div>`).join("");
+}
+function complete(id){
+  if(state.done.includes(id)) return;
+  const t=tasks.find(x=>x.id===id); state.done.push(id); state.xp+=t.xp;
+  localStorage.setItem("bossGame",JSON.stringify(state));
+  render();
+  if(tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+}
+function showTab(id,btn){
+  ["tasks","rating","rewards"].forEach(x=>document.getElementById(x).classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); btn.classList.add("active");
+}
+function invite(){
+  const u=tg?.initDataUnsafe?.user;
+  const bot="https://t.me/HooKahBossGameBot";
+  const text="👑 Я играю в BOSS GAME HOOКAH BOSS. Залетай и попробуй обогнать меня!";
+  if(navigator.share) navigator.share({text:text+" "+bot});
+  else if(tg?.openTelegramLink) tg.openTelegramLink(bot);
+  else navigator.clipboard?.writeText(text+" "+bot);
+}
+render();
+</script>
+</body>
+</html>
